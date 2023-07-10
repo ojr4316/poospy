@@ -32,7 +32,7 @@ class LX16A:
     
     ########### Initialization Functions ###########
     # Must be called before use!
-    
+        
     @staticmethod
     def initialize(port):
         LX16A.controller = serial.Serial(port=port, baudrate=115200, timeout=.01)
@@ -64,7 +64,7 @@ class LX16A:
 
     @staticmethod
     def toBytes(n):
-        print(n)
+        #print(n)
         if n < 0 or n > 65535:
             raise ServoArgumentError(None, f"Input out of range")
         return [n & 255, n // 256]
