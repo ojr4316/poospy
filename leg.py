@@ -1,5 +1,4 @@
-from motion.maths import Vector, calc_fk
-from comm.lx16a import ServoArgumentError
+from lx16a import ServoArgumentError
 
 class Leg:
 
@@ -15,12 +14,10 @@ class Leg:
         self.beta_motor = motors[1]
         self.gamma_motor = motors[2]
 
-        self.knee_vector = Vector(0,0,0)
-        self.hip_vector = Vector(0,0,0)
-
-        self.ee_pos = Vector(0,0,0)
+        #self.knee_vector = Vector(0,0,0)
+        #self.hip_vector = Vector(0,0,0)
+        #self.ee_pos = Vector(0,0,0)
         
-    
     def set_alpha(self, alpha):
         self.alpha = alpha
 
@@ -40,18 +37,14 @@ class Leg:
         return self.gamma
 
     def move_alpha(self, alpha, time):
-
         if alpha > 90 or alpha < -90:
             print(alpha)
             raise ServoArgumentError(self.id, "Input out of range")
 
         self.alpha = alpha
         self.alpha_motor.moveFromCenter( int(alpha), time)
-        
-      
-
+              
     def move_beta(self, beta, time):
-
         if beta > 90 or beta < -70:
             print(beta)
             raise ServoArgumentError(self.id, "Input out of range")
@@ -60,15 +53,14 @@ class Leg:
         self.beta_motor.moveFromCenter( int(beta), time)
 
     def move_gamma(self, gamma, time):
-
-        if gamma > 90 or gamma < -90:
-            print(gamma)
-            raise ServoArgumentError(self.id, "Input out of range")
+        #if gamma > 90 or gamma < -90:
+        #    print(gamma)
+        #    raise ServoArgumentError(self.id, "Input out of range")
 
         self.gamma = gamma
-        self.gamma_motor.moveFromCenter( int(gamma), time)
+        self.gamma_motor.moveFromCenter( int(gamma-90), time)
 
     def update_ee(self):
-        pos = calc_fk(self.alpha, self.beta, self.gamma)
-        self.ee_pos = Vector(pos[0], pos[1], pos[2])
+        #pos = calc_fk(self.alpha, self.beta, self.gamma)
+        self.ee_pos = np.array([pos[0], pos[1], pos[2]])
 

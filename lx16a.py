@@ -1,6 +1,6 @@
 import serial
 import weakref
-
+import time
 #################################
 # Created by: Ethan Lipson      #
 # Questions? Bugs? Email me at  #
@@ -196,12 +196,13 @@ class LX16A:
         if offset < -30 or offset > 30:
             raise ServoArgumentError(self.ID, f"Servo {self.ID}: Offset out of range")
         
-        angle = int(angle * 25 / 6)
+        angle = int(offset * 25 / 6)
         
         if offset < 0:
             offset += 256
         
         packet = [0x55, 0x55, self.ID, 4, 17, offset]
+        print(packet)
         LX16A.sendPacket(packet)
 
     # Permanently applies the offset angle set by
@@ -210,6 +211,8 @@ class LX16A:
     
     def angleOffsetWrite(self):
         packet = [0x55, 0x55, self.ID, 3, 18]
+        print(packet)
+
         LX16A.sendPacket(packet)
     
     # Permanently sets a restriction on the rotation
@@ -759,3 +762,30 @@ class LX16A:
     
     def getVirtualPos(self):
         return self.angle
+    
+    #==============NEW FUNCTIONS NEW FUNCTIONS NEW FUNCTIONS==================
+    
+    
+    def moveActually(self, pos, t=100):
+        self.moveTimeWrite(pos, t)
+        time.sleep(1)
+        print("First Try: " + str(self.getPhysicalPos()))
+
+        attempt = 0
+        lastOffset = self.getPhysicalPos()-pos
+        lastValue = self.getPhysicalPos()
+        print("Off by " + str(lastOffset))
+        
+        while servo.getPhysicalPos() != pos and attempt < 10:
+            print("Trying " + str(pos - lastOffset))
+            servo.moveTimeWrite(pos - lastOffset, 100)
+            time.sleep(1)
+            print("Attempt " + str(attempt+1) + ": " + str(self.getPhysicalPos()))
+            attempt+=1
+            if lastValue == self.getPhysicalPos():
+                lastOffset = (self.getPhysicalPos()-pos)*2
+            else:
+                lastOffset = self.getPhysicalPos()-pos
+            lastValue = self.getPhysicalPos()
+            
+            print("Off by " + str(lastOffset))
